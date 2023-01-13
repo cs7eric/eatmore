@@ -156,5 +156,23 @@ public class EmployeeController {
     }
 
 
+    /**
+     * 通过id查询 员工信息
+     *
+     * @param id id
+     * @return {@link R}<{@link Employee}>
+     */
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable("id") Long id){
+
+        Employee employee = employeeService.getById(id);
+        if(employee != null){
+            return R.success(employee);
+        }
+        return R.error("没有查询到员工信息");
+
+    }
+
+
 
 }
