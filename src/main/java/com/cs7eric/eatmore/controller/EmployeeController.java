@@ -72,6 +72,12 @@ public class EmployeeController {
 
     }
 
+    /**
+     * 注销
+     *
+     * @param request 请求
+     * @return {@link R}<{@link String}>
+     */
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request){
 
@@ -79,6 +85,13 @@ public class EmployeeController {
         return R.success("退出成功");
     }
 
+    /**
+     * 新增员工信息
+     *
+     * @param request  请求
+     * @param employee 员工
+     * @return {@link R}<{@link String}>
+     */
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
         log.info("封装的信息：{}",employee);
@@ -98,6 +111,14 @@ public class EmployeeController {
     }
 
 
+    /**
+     * 分页查询
+     *
+     * @param page     页面
+     * @param pageSize 页面大小
+     * @param name     名字
+     * @return {@link R}<{@link Page}>
+     */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name){
         log.info("page = {}, pageSize = {}, name = {}", page, pageSize, name);
@@ -115,5 +136,25 @@ public class EmployeeController {
         employeeService.page(pageInfo,queryWrapper);
         return R.success(pageInfo);
     }
+
+    /**
+     * 更新 员工信息
+     *
+     * @param employee 员工
+     * @return {@link R}<{@link String}>
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee){
+        log.info(employee.toString());
+        Long empId = (Long) request.getSession().getAttribute("employee");
+
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+
+        employeeService.updateById(employee);
+        return R.success("员工信息更改成功");
+    }
+
+
 
 }
