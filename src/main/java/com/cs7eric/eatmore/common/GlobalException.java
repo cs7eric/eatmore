@@ -38,4 +38,17 @@ public class GlobalException {
         }
         return R.error("未知错误");
     }
+
+    /**
+     * 异常处理程序
+     *
+     * @param exception 异常
+     * @return {@link R}<{@link String}>
+     */
+    @ExceptionHandler(CustomException.class)
+    public R<String> exceptionHandler(CustomException exception){
+
+        return R.error(exception.getMessage());
+    }
+
 }

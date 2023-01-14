@@ -2,6 +2,7 @@ package com.cs7eric.eatmore.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.cs7eric.eatmore.common.R;
+import com.cs7eric.eatmore.util.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.util.AntPathMatcher;
@@ -57,6 +58,7 @@ public class LoginCheckFilter implements Filter {
         // 4. 判断登录状态，如果已登录，则直接放行
         if(httpServletRequest.getSession().getAttribute("employee") != null){
             log.info("用户已登录，用户id为：{}", httpServletRequest.getSession().getAttribute("employee"));
+            BaseContext.setCurrentId((Long) httpServletRequest.getSession().getAttribute("employee"));
             filterChain.doFilter(httpServletRequest,httpServletResponse);
             return;
         }
