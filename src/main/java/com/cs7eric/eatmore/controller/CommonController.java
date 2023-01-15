@@ -31,6 +31,12 @@ public class CommonController {
     @Value("${eatmore.path}")
     private String basePath;
 
+    /**
+     * 文件上传
+     *
+     * @param file 文件
+     * @return {@link R}<{@link String}>
+     */
     @PostMapping("/upload")
     public R<String> upload(MultipartFile file){
 
@@ -66,6 +72,12 @@ public class CommonController {
     }
 
 
+    /**
+     * 文件下载
+     *
+     * @param name     名字
+     * @param response 响应
+     */
     @GetMapping("/download")
     public void download(String name, HttpServletResponse response){
 

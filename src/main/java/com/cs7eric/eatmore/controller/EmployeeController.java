@@ -4,7 +4,9 @@ package com.cs7eric.eatmore.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cs7eric.eatmore.common.R;
+import com.cs7eric.eatmore.entity.Category;
 import com.cs7eric.eatmore.entity.Employee;
+import com.cs7eric.eatmore.service.CategoryService;
 import com.cs7eric.eatmore.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -13,7 +15,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,6 +31,9 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private CategoryService categoryService;
 
 
     /**
@@ -165,7 +170,6 @@ public class EmployeeController {
         return R.error("没有查询到员工信息");
 
     }
-
 
 
 }
