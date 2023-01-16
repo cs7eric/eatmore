@@ -162,4 +162,22 @@ public class DishController {
         return R.success("删除成功");
     }
 
+    /**
+     * 查询 dish  信息
+     *
+     * @param dish 菜
+     * @return {@link R}<{@link List}<{@link Dish}>>
+     */
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish){
+
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(dish.getCategoryId() != null, Dish :: getCategoryId, dish.getCategoryId())
+                .eq(Dish :: getStatus, 1);
+        queryWrapper.orderByAsc(Dish :: getSort).orderByDesc(Dish :: getUpdateTime);
+        List<Dish> list = dishService.list(queryWrapper);
+        return R.success(list);
+    }
+
+
 }

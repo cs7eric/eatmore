@@ -1,8 +1,11 @@
 package com.cs7eric.eatmore.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cs7eric.eatmore.dto.SetmealDto;
 import com.cs7eric.eatmore.entity.Setmeal;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * setmeal服务
@@ -10,6 +13,19 @@ import org.springframework.stereotype.Service;
  * @author cs7eric
  * @date 2023/01/14
  */
-@Service
 public interface SetmealService extends IService<Setmeal> {
+    /**
+     * 保存 套餐
+     *
+     * @param setmealDto setmeal dto
+     */
+    void saveWithDish(SetmealDto setmealDto);
+
+    /**
+     * 批处理删除
+     *
+     * @param ids id
+     * @return boolean
+     */
+    boolean removeBatchWithDish(List<Long> ids);
 }
