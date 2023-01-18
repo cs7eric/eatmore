@@ -5,8 +5,6 @@ import com.cs7eric.eatmore.dto.DishDto;
 import com.cs7eric.eatmore.entity.Dish;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  *  dish service
  *
