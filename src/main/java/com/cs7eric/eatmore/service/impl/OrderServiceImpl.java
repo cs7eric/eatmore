@@ -143,7 +143,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         Page<OrdersDto> dtoPage = new Page<>();
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         Long userId = BaseContext.getCurrentId();
-        queryWrapper.eq(Orders :: getUserId, userId);
 
         queryWrapper.eq(!Objects.isNull(number), Orders :: getId, number);
 
