@@ -77,4 +77,47 @@ public class ShoppingCartController {
         return R.success(list);
     }
 
+    /**
+     *  购物车下单物品数量减一，如果数量为 1，则删除该物品
+     *
+     * @param shoppingCart 购物车
+     * @return {@link R}<{@link String}>
+     */
+    @PostMapping("/sub")
+    public R<String> sub(@RequestBody ShoppingCart shoppingCart){
+
+        log.info("shoppingCart:{}",shoppingCart);
+
+        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ShoppingCart :: getDishId, shoppingCart.getDishId());
+        ShoppingCart shoppingCartServiceOne = shoppingCartService.getOne(queryWrapper);
+
+        Integer number = shoppingCartServiceOne.getNumber();
+
+        // 如果 数量为 1，删除该物品
+        if (number == 1){
+            shoppingCartService.remove(queryWrapper);
+        }
+
+        shoppingCartServiceOne.setNumber(--number);
+        shoppingCartService.updateById(shoppingCartServiceOne);
+
+        return R.success("修改成功");
+    }
+
+    /**
+     *  清空购物车成功
+     *
+     * @return {@link R}<{@link String}>
+     */
+    @DeleteMapping("/clean")
+    public R<String> clean(){
+
+        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
+        Long currentId = BaseContext.getCurrentId();
+        queryWrapper.eq(ShoppingCart :: getUserId, currentId);
+        shoppingCartService.remove(queryWrapper);
+        return R.success("清空购物车成功");
+    }
+
 }
