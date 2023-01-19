@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cs7eric.eatmore.common.R;
 import com.cs7eric.eatmore.entity.User;
 import com.cs7eric.eatmore.service.UserService;
+import com.cs7eric.eatmore.util.BaseContext;
 import com.cs7eric.eatmore.util.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -96,5 +97,18 @@ public class UserController {
             return R.success(one);
         }
         return R.error("登陆失败");
+    }
+
+
+    /**
+     *  客户端退出登录
+     *
+     * @return {@link R}<{@link String}>
+     */
+    @PostMapping("/loginout")
+    public R<String> logout(){
+
+        BaseContext.removeCurrentId();
+        return R.success("退出成功");
     }
 }
