@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cs7eric.eatmore.common.CustomException;
+import com.cs7eric.eatmore.common.R;
 import com.cs7eric.eatmore.dto.OrdersDto;
 import com.cs7eric.eatmore.entity.*;
 import com.cs7eric.eatmore.mapper.OrderMapper;
@@ -17,10 +18,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -132,4 +136,42 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
         return dtoPage.setRecords(dtoList);
     }
+
+    @Override
+    public Page<OrdersDto> pageForBackend(int page, int pageSize, Long number, String beginTime, String endTime) {
+        Page<Orders> pageInfo  = new Page<>(page, pageSize);
+        Page<OrdersDto> dtoPage = new Page<>();
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+        Long userId = BaseContext.getCurrentId();
+        queryWrapper.eq(Orders :: getUserId, userId);
+
+        queryWrapper.eq(!Objects.isNull(number), Orders :: getId, number);
+
+
+        queryWrapper.ge(beginTime != null, Orders :: getOrderTime, beginTime);
+
+        queryWrapper.le(endTime != null, Orders :: getOrderTime, endTime);
+
+
+        queryWrapper.orderByDesc(Orders :: getOrderTime);
+        this.page(pageInfo, queryWrapper);
+
+        BeanUtils.copyProperties(pageInfo, dtoPage, "records");
+
+        List<Orders> records = pageInfo.getRecords();
+        List<OrdersDto> dtoList =  records.stream().map((item) -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+            ordersDto.setUserName(BaseContext.getCurrentId().toString());
+            LambdaQueryWrapper<OrderDetail> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(OrderDetail :: getOrderId, item.getId());
+            List<OrderDetail> list = orderDetailService.list(wrapper);
+            ordersDto.setOrderDetails(list);
+            return ordersDto;
+        }).collect(Collectors.toList());
+
+        return dtoPage.setRecords(dtoList);
+    }
+
+
 }

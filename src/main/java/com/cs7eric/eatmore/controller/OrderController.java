@@ -14,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,10 +51,27 @@ public class OrderController {
         log.info("page{}",page);
         log.info("pageSize{}",pageSize);
 
-        Page<Orders> pageInfo  = new Page<>(page, pageSize);
 
         Page<OrdersDto> dtoPage = orderService.pageWithDetail(page, pageSize);
 
         return R.success(dtoPage);
+    }
+
+
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, Long number, String beginTime, String endTime){
+
+        Page<OrdersDto> dtoPage = orderService.pageForBackend(page, pageSize, number, beginTime, endTime);
+        return R.success(dtoPage);
+    }
+
+    @PutMapping
+    public R<String> status(@RequestBody Orders orders){
+
+        log.info("orders{}",orders);
+
+        orders.setStatus(orders.getStatus());
+        orderService.updateById(orders);
+        return R.success("状态已改变");
     }
 }
