@@ -2,8 +2,10 @@ package com.cs7eric.eatmore.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cs7eric.eatmore.common.CustomException;
+import com.cs7eric.eatmore.dto.OrdersDto;
 import com.cs7eric.eatmore.entity.*;
 import com.cs7eric.eatmore.mapper.OrderMapper;
 import com.cs7eric.eatmore.service.OrderDetailService;
@@ -11,6 +13,7 @@ import com.cs7eric.eatmore.service.OrderService;
 import com.cs7eric.eatmore.service.ShoppingCartService;
 import com.cs7eric.eatmore.service.UserService;
 import com.cs7eric.eatmore.util.BaseContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,5 +104,32 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
         // 清空购物车数据
         shoppingCartService.remove(sCquerryWrapper);
+    }
+
+    @Override
+    public Page<OrdersDto> pageWithDetail(int page, int pageSize) {
+
+        Page<Orders> pageInfo  = new Page<>(page, pageSize);
+        Page<OrdersDto> dtoPage = new Page<>();
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+        Long userId = BaseContext.getCurrentId();
+        queryWrapper.eq(Orders :: getUserId, userId);
+        queryWrapper.orderByDesc(Orders :: getOrderTime);
+        this.page(pageInfo, queryWrapper);
+
+        BeanUtils.copyProperties(pageInfo, dtoPage, "records");
+
+        List<Orders> records = pageInfo.getRecords();
+        List<OrdersDto> dtoList =  records.stream().map((item) -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+            LambdaQueryWrapper<OrderDetail> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(OrderDetail :: getOrderId, item.getId());
+            List<OrderDetail> list = orderDetailService.list(wrapper);
+            ordersDto.setOrderDetails(list);
+            return ordersDto;
+        }).collect(Collectors.toList());
+
+        return dtoPage.setRecords(dtoList);
     }
 }
