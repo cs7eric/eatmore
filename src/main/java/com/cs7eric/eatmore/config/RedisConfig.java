@@ -1,52 +1,42 @@
 package com.cs7eric.eatmore.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 /**
- * Redis 配置
+ * redis 配置
  *
  * @author cs7eric
  * @date 2023/03/30
  */
 @Configuration
-@Import(LettuceConnectionFactory.class)
 public class RedisConfig {
-    /**
-     * redis序列化的工具配置类，下面这个请一定开启配置
-     * 127.0.0.1:6379> keys *
-     * 1) "ord:102"  序列化过
-     * 2) "\xac\xed\x00\x05t\x00\aord:102"   野生，没有序列化过
-     * this.redisTemplate.opsForValue(); //提供了操作string类型的所有方法
-     * this.redisTemplate.opsForList(); // 提供了操作list类型的所有方法
-     * this.redisTemplate.opsForSet(); //提供了操作set的所有方法
-     * this.redisTemplate.opsForHash(); //提供了操作hash表的所有方法
-     * this.redisTemplate.opsForZSet(); //提供了操作zset的所有方法
-     * @param lettuceConnectionFactory  lettuceConnectionFactory
-     * @return RedisTemplate
-     */
+
+
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory)
-    {
-        RedisTemplate<String,Object> redisTemplate = new RedisTemplate<>();
+    @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
+    public RedisTemplate<Object, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+        RedisTemplate<Object, Object> template = new RedisTemplate();
+        template.setConnectionFactory(lettuceConnectionFactory);
+        // 使用JSON格式序列化对象，对缓存数据key和value进行转换
+        Jackson2JsonRedisSerializer jacksonSeial = new Jackson2JsonRedisSerializer(Object.class);
 
-        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
-        //设置key序列化方式string
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        //设置value的序列化方式json，使用GenericJackson2JsonRedisSerializer替换默认序列化
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-
-        redisTemplate.afterPropertiesSet();
-
-        return redisTemplate;
+        // 解决查询缓存转换异常的问题
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jacksonSeial.setObjectMapper(om);
+        // 设置RedisTemplate模板API的序列化方式为JSON
+        template.setDefaultSerializer(jacksonSeial);
+        return template;
     }
+
 }
