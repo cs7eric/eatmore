@@ -12,6 +12,16 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  redis:
+    host: 192.168.21.135
+    port: 6379
+    password: C020611.
+    database: 0
+
+
+
+
+
 
 mybatis-plus:
   configuration:
@@ -24,4 +34,3 @@ mybatis-plus:
 
 eatmore:
   path: D:\cache-repo\
-
