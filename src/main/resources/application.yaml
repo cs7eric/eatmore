@@ -13,10 +13,16 @@ spring:
     multipart:
       max-file-size: 10MB
   redis:
-    host: 192.168.21.135
-    port: 6379
     password: C020611.
+    timeout: 5000
     database: 0
+    lettuce:
+      pool:
+        enabled: true
+        max-active: 8
+
+    port: 6379
+    host: 192.168.21.135
 
 
 
@@ -25,7 +31,6 @@ spring:
 
 mybatis-plus:
   configuration:
-    #???????????????????????????????????????
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
