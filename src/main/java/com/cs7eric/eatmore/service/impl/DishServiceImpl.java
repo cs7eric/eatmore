@@ -10,6 +10,7 @@ import com.cs7eric.eatmore.service.DishFlavorService;
 import com.cs7eric.eatmore.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private DishFlavorService dishFlavorService;
@@ -48,6 +52,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
         // 保存菜品口味数据到 口味表dish_flavor
         dishFlavorService.saveBatch(flavors);
+        String key = "dish_*";
+        redisTemplate.delete(key);
     }
 
     @Override
@@ -110,5 +116,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             flavorLambdaQueryWrapper.eq(DishFlavor :: getDishId, ids[i]);
             dishFlavorService.remove(flavorLambdaQueryWrapper);
         }
+        // 只清理该修改菜品分类下的缓存数据，精确清理，因为可能已经缓存了 好几个分类下的 数据
+        String key = "dish_*" ;
+        redisTemplate.delete(key);
     }
 }

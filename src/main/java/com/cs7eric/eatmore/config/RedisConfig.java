@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandi
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
@@ -20,12 +19,11 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-
     @Bean
     @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
-    public RedisTemplate<Object, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, Object> template = new RedisTemplate();
-        template.setConnectionFactory(lettuceConnectionFactory);
+        template.setConnectionFactory(redisConnectionFactory);
         // 使用JSON格式序列化对象，对缓存数据key和value进行转换
         Jackson2JsonRedisSerializer jacksonSeial = new Jackson2JsonRedisSerializer(Object.class);
 
@@ -38,5 +36,4 @@ public class RedisConfig {
         template.setDefaultSerializer(jacksonSeial);
         return template;
     }
-
 }
