@@ -14,6 +14,8 @@ import com.cs7eric.eatmore.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +41,7 @@ public class SetmealController {
      * @param setmealDto setmeal dto
      * @return {@link R}<{@link String}>
      */
+    @CacheEvict(value = "setmealCache", allEntries = true)
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto) {
 
@@ -120,6 +123,7 @@ public class SetmealController {
         return R.success("已停售");
     }
 
+    @CacheEvict(value = "setmealCache", allEntries = true)
     @DeleteMapping
     public R<String> remove(@RequestParam("ids") List<Long> ids) {
 
@@ -136,6 +140,7 @@ public class SetmealController {
      * @param setmeal setmeal
      * @return {@link R}<{@link List}<{@link Setmeal}>>
      */
+    @Cacheable(value = "setmealCache", key = "#setmeal.categoryId + '_' + #setmeal.status")
     @GetMapping("/list")
     public R<List<Setmeal>> list(Setmeal setmeal) {
 
@@ -155,5 +160,31 @@ public class SetmealController {
         queryWrapper.eq(id != null, Dish :: getId, id);
         Dish dish = dishService.getOne(queryWrapper);
         return R.success(dish);
+    }
+
+    /**
+     * 通过id获取setmeal
+     *
+     * @return {@link R}<{@link Setmeal}>
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> getById (@PathVariable("id") Long id){
+
+        SetmealDto dto = setmealService.getByIdWithDishes(id);
+        return R.success(dto);
+    }
+
+    /**
+     * 更新通过id
+     *
+     * @param setmealDto setmeal dto
+     * @return {@link R}<{@link String}>
+     */
+    @CacheEvict(value = "setmealCache", key = "#setmealDto.categoryId + '_' + #setmealDto.status" )
+    @PutMapping()
+    public R<String> updateById (@RequestBody SetmealDto setmealDto) {
+
+        setmealService.updateWithDishes(setmealDto);
+        return R.success("修改成功");
     }
 }
