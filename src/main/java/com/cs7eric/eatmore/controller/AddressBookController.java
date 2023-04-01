@@ -2,14 +2,12 @@ package com.cs7eric.eatmore.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cs7eric.eatmore.common.R;
 import com.cs7eric.eatmore.entity.AddressBook;
-import com.cs7eric.eatmore.service.impl.AddressBookService;
+import com.cs7eric.eatmore.service.impl.AddressBookServiceImpl;
 import com.cs7eric.eatmore.util.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.List;
 public class AddressBookController {
 
     @Autowired
-    private AddressBookService addressBookService;
+    private AddressBookServiceImpl addressBookService;
 
     /**
      * 新增

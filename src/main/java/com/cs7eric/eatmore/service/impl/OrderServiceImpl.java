@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cs7eric.eatmore.common.CustomException;
-import com.cs7eric.eatmore.common.R;
 import com.cs7eric.eatmore.dto.OrdersDto;
 import com.cs7eric.eatmore.entity.*;
 import com.cs7eric.eatmore.mapper.OrderMapper;
@@ -18,8 +17,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -38,7 +35,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     private UserService userService;
 
     @Autowired
-    private AddressBookService addressBookService;
+    private AddressBookServiceImpl addressBookService;
 
     @Autowired
     private OrderDetailService orderDetailService;
