@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- *  菜品
+ * 菜品
  *
  * @author cs7eric
  * @date 2023/01/15
@@ -45,13 +45,13 @@ public class DishController {
     private CategoryService categoryService;
 
     /**
-     *  新增菜品
+     * 新增菜品
      *
-     * @param dishDto  dto
+     * @param dishDto dto
      * @return {@link R}<{@link String}>
      */
     @PostMapping
-    public R<String> save(@RequestBody DishDto dishDto){
+    public R<String> save(@RequestBody DishDto dishDto) {
 
         dishService.saveWithFlavor(dishDto);
         String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
@@ -68,7 +68,7 @@ public class DishController {
      * @return {@link R}<{@link Page}>
      */
     @GetMapping("/page")
-    public R<Page> page(int page, int  pageSize, String name){
+    public R<Page> page(int page, int pageSize, String name) {
 
         // 构造分页构造器对象
         Page<Dish> pageInfo = new Page<>(page, pageSize);
@@ -76,11 +76,11 @@ public class DishController {
 
         // 条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(name != null, Dish :: getName, name);
-        queryWrapper.orderByDesc(Dish :: getCreateTime);
+        queryWrapper.like(name != null, Dish::getName, name);
+        queryWrapper.orderByDesc(Dish::getCreateTime);
 
         // 执行分页查询
-        dishService.page(pageInfo,queryWrapper);
+        dishService.page(pageInfo, queryWrapper);
 
         //  对象拷贝
         BeanUtils.copyProperties(pageInfo, dishDtoPage, "records");
@@ -88,13 +88,13 @@ public class DishController {
         List<Dish> records = pageInfo.getRecords();
         List<DishDto> list = records.stream().map((item) -> {
             DishDto dishDto = new DishDto();
-            BeanUtils.copyProperties(item,dishDto);
+            BeanUtils.copyProperties(item, dishDto);
             Long categoryId = item.getCategoryId();
 
             //根据 ID 查询 分类对象
             Category category = categoryService.getById(categoryId);
 
-            if (category != null){
+            if (category != null) {
                 String categoryName = category.getName();
                 dishDto.setCategoryName(categoryName);
             }
@@ -113,7 +113,7 @@ public class DishController {
      * @return {@link R}<{@link DishDto}>
      */
     @GetMapping("/{id}")
-    public R<DishDto> getById(@PathVariable("id") Long id){
+    public R<DishDto> getById(@PathVariable("id") Long id) {
 
         DishDto dishDto = dishService.getByIdWithFlavor(id);
 
@@ -127,25 +127,25 @@ public class DishController {
      * @return {@link R}<{@link String}>
      */
     @PutMapping
-    public R<String> updateById(@RequestBody DishDto dishDto){
+    public R<String> updateById(@RequestBody DishDto dishDto) {
 
         dishService.updateByIdWithFlavor(dishDto);
 
-        String key ="dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
+        String key = "dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus();
         redisTemplate.delete(key);
         return R.success("修改成功");
     }
 
 
     /**
-     *  更改状态
+     * 更改状态
      *
      * @param ids    id
      * @param status 状态
      * @return {@link R}<{@link String}>
      */
     @PostMapping("/status/{status}")
-    public R<String> status(Long[] ids, @PathVariable("status") Integer status){
+    public R<String> status(Long[] ids, @PathVariable("status") Integer status) {
 
         for (Long id : ids) {
             LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
@@ -164,7 +164,7 @@ public class DishController {
      * @return {@link R}<{@link String}>
      */
     @DeleteMapping
-    public R<String> delete(Long[] ids){
+    public R<String> delete(Long[] ids) {
 
         log.info("ids:{}", ids);
         dishService.deleteWithFlavor(ids);
@@ -179,7 +179,7 @@ public class DishController {
      * @return {@link R}<{@link List}<{@link DishDto}>>
      */
     @GetMapping("/list")
-    public R<List<DishDto>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish) {
 
         //  提前定义好 dishDtoList，用于接收 redis 获取的 value
         List<DishDto> dishDtoList = null;
@@ -201,9 +201,9 @@ public class DishController {
         }
 
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(dish.getCategoryId() != null, Dish :: getCategoryId, dish.getCategoryId());
-        queryWrapper.eq(Dish :: getStatus, 1);
-        queryWrapper.orderByAsc(Dish :: getSort).orderByDesc(Dish :: getUpdateTime);
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        queryWrapper.eq(Dish::getStatus, 1);
+        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
         List<Dish> list = dishService.list(queryWrapper);
 
         List<DishDto> dtoList = list.stream().map((item) -> {
@@ -214,13 +214,13 @@ public class DishController {
             //根据id查询分类对象
             Category category = categoryService.getById(categoryId);
 
-            if(category != null){
+            if (category != null) {
                 String categoryName = category.getName();
                 dishDto.setCategoryName(categoryName);
             }
 
             LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(DishFlavor :: getDishId, item.getId());
+            wrapper.eq(DishFlavor::getDishId, item.getId());
             List<DishFlavor> dishFlavors = dishFlavorService.list(wrapper);
             dishDto.setFlavors(dishFlavors);
             return dishDto;

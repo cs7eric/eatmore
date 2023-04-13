@@ -16,8 +16,7 @@ class EatmoreApplicationTests {
     @Test
     void contextLoads() {
 
-        redisTemplate.opsForValue().set("k2","v2");
+        redisTemplate.opsForValue().set("k2", "v2");
         System.out.println(redisTemplate.opsForValue().get("k2"));
     }
-
 }
